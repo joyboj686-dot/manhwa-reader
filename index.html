@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manhwa Reader — Free</title>
+<style>
+body{margin:0;font-family:system-ui,Arial;background:#0f0f12;color:#fff}
+header{position:sticky;top:0;background:#101010;padding:14px 20px;display:flex;gap:16px;align-items:center;border-bottom:2px solid #c6121f}
+header b{font-size:20px} header b span{color:#ff2a3c}
+input{margin-left:auto;padding:9px 12px;border-radius:8px;border:0;width:220px}
+main{max-width:980px;margin:0 auto;padding:20px}
+.hero{background:linear-gradient(135deg,#c6121f,#5b0a12);border-radius:16px;padding:28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:20px}
+.card{background:#1a1a20;border-radius:14px;overflow:hidden;cursor:pointer}
+.card img{width:100%;height:260px;object-fit:cover;display:block}
+.card div{padding:12px}.card h3{margin:0 0 6px;font-size:16px}.card p{margin:0;color:#aaa;font-size:13px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.chips button{background:#222;border:1px solid #333;color:#fff;padding:8px 14px;border-radius:999px;cursor:pointer}
+.chips button.on{background:#c6121f}
+#reader{display:none}#reader img{width:100%;max-width:760px;display:block;margin:0 auto}
+#reader .bar{position:sticky;top:64px;background:#101010;padding:10px;display:flex;gap:10px;align-items:center}
+button{cursor:pointer}
+</style></head>
+<body>
+<header><b>Manhwa <span>Reader</span></b><input id="q" placeholder="Search manhwa..." oninput="filter()"></header>
+<main id="home">
+<div class="hero"><h1 style="margin:0">Read manhwa free, vertical scroll.</h1><p>Original sample series — replace with your own titles. No login needed.</p></div>
+<div class="chips" id="chips"></div>
+<div class="grid" id="grid"></div>
+<p style="color:#888">Free on Vercel • Add your own chapters by editing the data in this file • For your own / licensed manhwa only.</p>
+</main>
+<main id="reader">
+<div class="bar"><button onclick="showHome()">← Back</button><b id="rtitle"></b><span id="rchap" style="margin-left:auto"></span><button onclick="nextChap()">Next →</button></div>
+<div id="pages"></div>
+<div style="text-align:center;padding:20px"><button onclick="nextChap()" style="padding:12px 22px;background:#c6121f;color:#fff;border:0;border-radius:10px">Next Chapter →</button></div>
+</main>
+<script>
+const series=[
+{id:1,title:"Sword of the Silent Moon",genre:"Murim",rating:"9.2",status:"Ongoing",ch:12,img:"https://picsum.photos/seed/moon/400/560",desc:"A silent swordsman returns after 10 years."},
+{id:2,title:"The Last Alchemist",genre:"Fantasy",rating:"9.0",status:"Completed",ch:8,img:"https://picsum.photos/seed/alch/400/560",desc:"Alchemy, curses and a second chance."},
+{id:3,title:"Dungeon Chef",genre:"Action",rating:"8.8",status:"Ongoing",ch:15,img:"https://picsum.photos/seed/chef/400/560",desc:"He cooks monsters to survive the dungeon."},
+{id:4,title:"My Guild Is Broke",genre:"Comedy",rating:"8.6",status:"Ongoing",ch:6,img:"https://picsum.photos/seed/guild/400/560",desc:"The weakest guild, the biggest debts."}];
+let curGenre="All", cur=null, curCh=1;
+const genres=["All",...new Set(series.map(s=>s.genre))];
+document.getElementById('chips').innerHTML=genres.map(g=>`<button class="${g==='All'?'on':''}" onclick="setGenre('${g}',this)">${g}</button>`).join('');
+function render(list){
+document.getElementById('grid').innerHTML=list.map(s=>`<div class="card" onclick="openSeries(${s.id})"><img src="${s.img}" alt="${s.title}"><div><h3>${s.title}</h3><p>★ ${s.rating} • ${s.genre} • ${s.status} • ${s.ch} ch</p><p>${s.desc}</p></div></div>`).join('');
+}
+function setGenre(g,el){curGenre=g;document.querySelectorAll('.chips button').forEach(b=>b.classList.remove('on'));el.classList.add('on');filter();}
+function filter(){const q=document.getElementById('q').value.toLowerCase();render(series.filter(s=>(curGenre==='All'||s.genre===curGenre)&&s.title.toLowerCase().includes(q)));}
+function openSeries(id){cur=series.find(s=>s.id===id);curCh=1;showReader();}
+function showReader(){document.getElementById('home').style.display='none';document.getElementById('reader').style.display='block';document.getElementById('rtitle').textContent=cur.title;document.getElementById('rchap').textContent='Chapter '+curCh;document.getElementById('pages').innerHTML=[1,2,3,4,5].map(i=>`<img src="https://picsum.photos/seed/${cur.id}-${curCh}-${i}/760/1000" alt="Page ${i}">`).join('');window.scrollTo(0,0);}
+function nextChap(){if(curCh<cur.ch){curCh++;showReader();}else alert('You are caught up!');}
+function showHome(){document.getElementById('reader').style.display='none';document.getElementById('home').style.display='block';}
+render(series);
+</script></body></html>
